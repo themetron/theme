@@ -99,6 +99,10 @@ export const getUnweightedChannelLuminance = (channelValue) => {
               ) / 0.2126
           )
   )
+
+  So now I can get r as a percentage, given luminance, green as a percentage, and blue as a percentage.
+
+
 */
 export const getChannelValueFromUnweightedChannelLuminance = (unweightedChannelLuminance) => {
   let channelPercent;
@@ -113,6 +117,15 @@ export const getChannelValueFromUnweightedChannelLuminance = (unweightedChannelL
 }
 
 const channelLuminanceWeights = [0.2126, 0.7152, 0.0722];
+// So the luminance doesn't have any goofy power stuff.
+// If we have the rgb, we can create a linear rgb-ratio-based luminance multiplier, I think.
+// Then we can take the target luminance, divide by that multiplier, and reverse out the rgb values from there?
+// This would be so much simpler in rgb color space.
+
+// Note to self: TEST to make sure a known rgb-based formula doesn't give the same H and S values.
+// If it does, we can be done.
+// https://ux.stackexchange.com/questions/82319/how-to-find-an-accessible-color-by-changing-lightness-only
+// Result: It does not.
 
 const getWeightedChannelLuminances = unweightedChannelLuminances => unweightedChannelLuminances
   .map((ul, i) => ul * channelLuminanceWeights[i]);
