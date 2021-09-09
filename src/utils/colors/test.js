@@ -5,9 +5,32 @@ import {
   getContrastRatio,
   getLuminance,
   getUnweightedChannelLuminance,
-  setColorByContrastWithHsl,
-  setColorByLuminanceWithHsl,
-} from './colors';
+  guessColorByContrastWithHsl,
+  guessColorByLuminanceWithHsl,
+  guessColorRamp,
+} from './';
+
+describe('guessColorRamp', () => {
+  it('black and white are equal', () => {
+    const blackRamp = guessColorRamp('#000000');
+    const whiteRamp = guessColorRamp('#000000');
+
+    expect(blackRamp).toEqual(whiteRamp);
+
+    expect(whiteRamp).toEqual({
+        10: '#f4f4f4',
+        20: '#d9d9d9',
+        30: '#bfbfbf',
+        40: '#a6a6a6',
+        50: '#8d8d8d',
+        60: '#6f6f6f',
+        70: '#595959',
+        80: '#404040',
+        90: '#2c2c2c',
+        100: '#171717'
+      });
+  });
+});
 
 describe('getChannelValueFromUnweightedChannelLuminance', () => {
   it.each([
@@ -87,14 +110,14 @@ describe('getContrastRatio (approx)', () => {
   });
 });
 
-describe('setColorByLuminanceWithHsl', () => {
+describe('guessColorByLuminanceWithHsl', () => {
   it.each([
     ['#0000ff', 0.8],
     ['#123456', 0.6],
     ['#ff00ff', 0.2],
     ['#00ffff', 0.1],
   ])('Can make a color with the same hue and saturation as %s but luminance %d', (initHex, targetLuminance) => {
-    const newHex = setColorByLuminanceWithHsl({
+    const newHex = guessColorByLuminanceWithHsl({
       hex: initHex,
       luminance: targetLuminance,
     });
@@ -119,14 +142,14 @@ describe('setColorByLuminanceWithHsl', () => {
     ['#ffffff', 0.5395, '#c2c2c2'],
     ['#ff00ff', 0.5061, '#ff97ff'],
   ])('Gets expected color', (hex, luminance, expected) => {
-    expect(setColorByLuminanceWithHsl({
+    expect(guessColorByLuminanceWithHsl({
       hex,
       luminance,
     })).toEqual(expected);
   })
 });
 
-describe('setColorByContrastWithHsl', () => {
+describe('guessColorByContrastWithHsl', () => {
   it.each([
     [
       21,
@@ -139,7 +162,7 @@ describe('setColorByContrastWithHsl', () => {
       '#000000',
     ],
   ])('Generating color with contrast %d from color %s on a %s background', (expectedContrastRatio, hex) => {
-    const color = setColorByContrastWithHsl({
+    const color = guessColorByContrastWithHsl({
       hex,
       baseHex: '#ffffff',
       contrastRatio: expectedContrastRatio,
@@ -168,7 +191,7 @@ describe('setColorByContrastWithHsl', () => {
     const darkBase = '#000000';
     const targetContrastRatio = 7;
 
-    const colorWithLightBase = setColorByContrastWithHsl({
+    const colorWithLightBase = guessColorByContrastWithHsl({
       hex: mediumLuminanceColor,
       baseHex: lightBase,
       contrastRatio: targetContrastRatio,
@@ -179,7 +202,7 @@ describe('setColorByContrastWithHsl', () => {
       hexB: colorWithLightBase,
     });
 
-    const colorWithDarkBase = setColorByContrastWithHsl({
+    const colorWithDarkBase = guessColorByContrastWithHsl({
       hex: mediumLuminanceColor,
       baseHex: darkBase,
       contrastRatio: targetContrastRatio,
